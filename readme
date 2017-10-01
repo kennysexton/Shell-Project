@@ -1,0 +1,61 @@
+-------------------------------------------------------
+kenny-shell manual
+Type 'help' to see this list
+-------------------------------------------------------
+
+			Commands
+========================================================
+cd [path]
+Used to change the current directory
+
+clear
+clears the screen
+
+dir [path]
+Will list all of the files in the specified directory
+
+environ
+List all of environment strings
+
+echo [comment]
+Display a line of text 
+
+help
+displays this manual
+
+pwd
+Shows the current working directory
+
+quit
+exits the shell
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
