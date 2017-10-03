@@ -9,7 +9,7 @@ const char * pathTrim(char *path);  // prints path or relative path on prompt
 void exitmsg(); // quit or exit command
 
 	/* Batch File */
-void inputFromFile();
+char *inputFromFile();
 
 	/* Build Ins */
 void cd(int argc, char **argv);  // cd command
@@ -17,6 +17,7 @@ void clear(); // clr command
 char *dir(int argc, char **argv); // dir command
 void environls();  // environ command
 void echo(int argc, char **argv); // echo command
+char *ls(); // ls command
 void help(); // help command
 void usrPause(); // Pause command
 
@@ -43,15 +44,17 @@ int main() {
 	char **argv;
 	argv = malloc(sizeof(char)* 200);
 
-	int argc; // argument counter
+	int argc = 0; // argument counter
 
 	char batchfile[] = {"myshell batchfile\n"}; // batchfile command
 	char lineInput[80];
+	char fileInput[80];
 	system("clear");  // Use System clear to give the shell a clean look on startup
 
 	while( strcmp(lineInput, "quit") != 0 && strcmp(lineInput, "exit") != 0){ // exit the program by typing "quit","exit" or using your escape command ex. ctrl^c
-		
+
 		prompt();	
+
 			/* Read Input */
 		fgets(lineInput, 80 ,stdin);
 
@@ -63,33 +66,47 @@ int main() {
 		}
 		else {
 
-			if(strcmp(lineInput, batchfile) == 0){ // if User types "myshell batchfile"
-				inputFromFile();
-			}
-			else {
-				printf("not same\n");
-			}
-
-
-				/* Parse Input */
 			char *token;
 			char flags[] = {' ', '-', '\n'};
-			
-			token = strtok(lineInput, flags);
+
+			if(strcmp(lineInput, batchfile) == 0){ // if User types "myshell batchfile"
+				strcpy(fileInput,inputFromFile());
+				// printf("fileInput: %s", fileInput );
+				// printf("hello?\n");
+				token = strtok(fileInput, flags);
+			}
+			else {
+				token = strtok(lineInput, flags);
+			}
+
+				/* Parse Input */
 			argv[argc] = token;
 			// printf("%s %s %d\n", token, argv[argc], argc);
-			
+
 			while (token != NULL){		
 				token = strtok(NULL, flags);
 				argc++;
 				argv[argc] = token;
 				// printf("%s %s %d\n", token, argv[argc], argc);
 			}
+			for (i = 0; i < argc; i++){  // Look at array input
+			 	printf("run: %d   %s\n", i, argv[i]);
+			 	if (strcmp(argv[i], ">") == 0){
+			 		printf("> input redirection\n");
+			 	}
+			 	else if (strcmp(argv[i], "<") == 0){
+			 		printf("< output redirection\n");
+			 	}
+			 	else if (strcmp(argv[i], "|") == 0){
+			 		printf("pipe\n");
+			 	}
+			 	else if (strcmp(argv[i], "&") == 0){
+			 		printf("background operation\n");
+			 	}
+			}
 
-			// for (i = 0; i < argc; i++){  // Look at array input
-			//  	printf("run: %d   %s\n", i, argv[i]);
-			// }
 
+			
 			if(strcmp(argv[0], "cd") == 0){  // cd
 				cd(argc, argv);
 			}
@@ -108,11 +125,14 @@ int main() {
 			else if(strcmp(argv[0], "help") == 0){ // help
 				help();
 			}
-			else if(strcmp(argv[0], "pwd") == 0){  //pwd
-				printf("%s\n", getenv("PWD"));
+			else if(strcmp(argv[0], "ls") == 0){ // ls
+				ls(argc, argv);
 			}
 			else if(strcmp(argv[0], "pause") == 0){ // pause
 				usrPause();
+			}
+			else if(strcmp(argv[0], "pwd") == 0){  //pwd
+				printf("%s\n", getenv("PWD"));
 			}
 			else{
 				printf(ANSI_COLOR_BRIGHT_RED "Invalid Command: " ANSI_COLOR_RESET);
@@ -181,12 +201,27 @@ const char * pathTrim(char *path){
 	}	
 	return  trimPath;
 }
-
-void inputFromFile(){
+	// reads batchfile and returns the string contained
+char *inputFromFile(){
 	FILE *rp; // read pointer
+	char *line = malloc(sizeof(char) * 80);
+	char c;
+	// char line[80];
+	int i=0;
 
+	rp = fopen("batchfile", "r"); // open batchfile
 
+	do {
+		c = fgetc(rp);  // read file 1 char at a time until '\n' or EOF
+		line[i] = c;
+		i++;
+	}while (c != EOF && c != '\n');
+
+	// printf("%s", line);
+	return line;
+	fclose(rp);
 }
+
 void exitmsg(){	// Prints a message when user quits or exits
 	printf(ANSI_COLOR_BIRGHT_BLUE "-- exiting kenny-shell --\n" ANSI_COLOR_RESET);
 }

@@ -38,10 +38,12 @@ void cd(int argc, char **argv){
 		printf("%s\n", getenv("PWD"));
 	}
 }
+
 void clear(){
 	system("clear");
 	//printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 }
+
 char *dir(int argc, char **argv){
 
 	if (chdir(argv[1]) == 0){
@@ -50,7 +52,6 @@ char *dir(int argc, char **argv){
 		if (d){
 			while ((dir = readdir(d)) != NULL){
 				printf("%s\n", dir->d_name);
-
 			}
 		}
 		closedir(d);
@@ -118,6 +119,19 @@ void help(){
 		}
 	}
 	fclose(rp);	
+}
+
+char *ls(){ // slightly modified dir command
+
+	DIR *d = opendir(getenv("PWD"));
+	struct dirent *dir;
+	if (d){
+		while ((dir = readdir(d)) != NULL){
+			printf("%s\n", dir->d_name);
+		}
+	}
+	closedir(d);
+	return 0;
 }
 
 void usrPause(){
