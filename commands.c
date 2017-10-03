@@ -10,7 +10,7 @@ char *upOne(char **argv); // Handles "cd .." case
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <dirent.h> // for dir();
+#include <dirent.h> // for dir() and ls();
 
 	/* Colors */
 #define ANSI_COLOR_CYAN_BOLD  "\033[1m\033[36m"  
@@ -127,9 +127,10 @@ char *ls(){ // slightly modified dir command
 	struct dirent *dir;
 	if (d){
 		while ((dir = readdir(d)) != NULL){
-			printf("%s\n", dir->d_name);
+			printf("%s ", dir->d_name);
 		}
 	}
+	printf("\n");
 	closedir(d);
 	return 0;
 }
