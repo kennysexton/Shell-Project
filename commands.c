@@ -141,10 +141,8 @@ void usrPause(){
 	char endPause[10];
 
 	fgets(endPause, sizeof(endPause), stdin);
-
 }
 
-	
 	// For: cd ..
 char *upOne(char **argv){ //used in CD
 	
