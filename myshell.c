@@ -148,12 +148,21 @@ int main() {
 
 			/* ----------------------------------- Left Right Split ------------------------------------ */
 			if (ioredirect == TRUE){
-				for(i=0; i< specialpos; i++){
-					left[i] = argv[i];
+
+					/* Checks */
+				if (argc - 1 == specialpos && special!= 4){  // modifiers > >> < | require arguments on both sides of modifier
+					special = 5;  // set to error
 				}
-				for(j = specialpos + 1; j < argc; j++){
-					right[j] = argv[j];
+				else{
+					for(i=0; i< specialpos; i++){
+						left[i] = argv[i];
+					}
+					for(j = specialpos + 1; j < argc ; j++){
+						right[j] = argv[j];
+						printf("%s\n", right[j]);
+					}
 				}
+
 
 				// for (i = 0; i < specialpos; i++){ 
 				// 	printf("%s\n", left[i]);
@@ -187,6 +196,12 @@ int main() {
 				case 4:		// &
 					printf("background\n");
 					break;
+				case 5: // error
+					printf(ANSI_COLOR_BRIGHT_RED "Misuse of modifier: " ANSI_COLOR_RESET);
+					printf("type "); 
+					printf(ANSI_COLOR_BIRGHT_BLUE "help" ANSI_COLOR_RESET);
+					printf(" to view manual\n");
+					break;
 				default:  // No speical character
 					cmdChoice(argc, argv);
 				}
@@ -196,6 +211,7 @@ int main() {
 				
 				// Rest argc and argv	
 			argc = 0;
+			ioredirect = FALSE;
 			for (i = 0; i < argc; i++){
 				argv[i] = NULL;
 			}
