@@ -7,20 +7,21 @@ void shellEnvir();  // Sets the shell environment variable to the path which it 
 void prompt();  // Print the prompt
 char * relpath(char *path); // prints ~ if relative path is displayed
 const char * pathTrim(char *path);  // prints path or relative path on prompt
+int checkToken(char* token);
 void exitmsg(); // quit or exit command
 
 	/* Batch File */
 char *inputFromFile();
 
 	/* Build Ins */
-void cd(int argc, char **argv);  // cd command
-void clear(); // clr command
-char *dir(int argc, char **argv); // dir command
-void environls();  // environ command
-void echo(int argc, char **argv); // echo command
-char *ls(); // ls command
-void help(); // help command
-void usrPause(); // Pause command
+// void cd(int argc, char **argv);  // cd command
+// void clear(); // clr command
+// char *dir(int argc, char **argv); // dir command
+// void environls();  // environ command
+// void echo(int argc, char **argv); // echo command
+// char *ls(); // ls command
+// void help(); // help command
+// void usrPause(); // Pause command
 
 char *upOne(char **argv); // Handles "cd .." case
 
@@ -33,7 +34,9 @@ char *cmdChoice(int argc, char **argv);
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/types.h>
 #include "commands.h"  // commands.c  contains built ins
+#include "utility.h"  // utiliy.c contains io modifier code and & code
 
 	/* Colors */
 #define ANSI_COLOR_CYAN_BOLD  "\033[1m\033[36m"  
@@ -42,14 +45,25 @@ char *cmdChoice(int argc, char **argv);
 #define ANSI_COLOR_BRIGHT_RED "\033[1m\033[31m"
 #define ANSI_COLOR_RESET  "\033[0m"
 
+#define TRUE 1
+#define FALSE 0
+
+/* Globals */
+
+
 
 	/* Main Function */
 int main() {
 
-	int i;
+	int i, j;
 	int special;
 	char **argv;
+	char **left;
+	char **right;
+	int ioredirect;
 	argv = malloc(sizeof(char)* 200);
+	left = malloc(sizeof(char)* 100);
+	right = malloc(sizeof(char)* 100);
 
 	int argc = 0; // argument counter
 
@@ -63,7 +77,7 @@ int main() {
 	while( strcmp(lineInput, "quit") != 0 && strcmp(lineInput, "exit") != 0){ // exit the program by typing "quit","exit" or using your escape command ex. ctrl^c
 
 		prompt();	
-
+		special = -1;
 			/* Read Input */
 		fgets(lineInput, 80 ,stdin);
 
@@ -81,14 +95,14 @@ int main() {
 			if(strcmp(lineInput, batchfile) == 0){ // if User types "myshell batchfile"
 				strcpy(fileInput,inputFromFile());
 				// printf("fileInput: %s", fileInput );
-				// printf("hello?\n");
 				token = strtok(fileInput, flags);
 			}
 			else {
 				token = strtok(lineInput, flags);
+				
 			}
 
-				/* Parse Input */
+				/* ----------------------------------- Parse Input ----------------------------------- */
 			argv[argc] = token;
 			// printf("%s %s %d\n", token, argv[argc], argc);
 
@@ -98,58 +112,83 @@ int main() {
 				argv[argc] = token;
 				// printf("%s %s %d\n", token, argv[argc], argc);
 			}
-			special = 0;
-			/* ---------- Special Cases ---------- */   // > >> < | & 
+			
+			int specialpos = 0;
+			/* ----------------------------------- Special Cases ----------------------------------- */   // > >> < | & 
 			for (i = 0; i < argc; i++){  // Look at array input
 			 	printf("run: %d   %s\n", i, argv[i]);
 			 	if (strcmp(argv[i], ">") == 0){
-			 		special = 1;
+			 		special = 0;
+			 		specialpos = i;
+			 		ioredirect = TRUE;
 			 	}
 			 	else if (strcmp(argv[i], ">>") == 0){
 			 		printf(">> input redirection append\n");
-			 		special = 2;
+			 		special = 1;
+			 		specialpos = i;
+			 		ioredirect = TRUE;
 			 	}
 			 	else if (strcmp(argv[i], "<") == 0){
-			 		special = 3;
+			 		special = 2;
+			 		specialpos = i;
+			 		ioredirect = TRUE;
 			 	}
 			 	else if (strcmp(argv[i], "|") == 0){
-			 		special = 4;
+			 		special = 3;
+			 		specialpos = i;
+			 		ioredirect = TRUE;
 			 	}
 			 	else if (strcmp(argv[i], "&") == 0){
-			 		special = 5;
+			 		special = 4;
+			 		specialpos = i;
+			 		ioredirect = TRUE;
 			 	}
 			}
 
+
+			/* ----------------------------------- Left Right Split ------------------------------------ */
+			if (ioredirect == TRUE){
+				for(i=0; i< specialpos; i++){
+					left[i] = argv[i];
+				}
+				for(j = specialpos + 1; j < argc; j++){
+					right[j] = argv[j];
+				}
+
+				// for (i = 0; i < specialpos; i++){ 
+				// 	printf("%s\n", left[i]);
+
+				// }
+			}
+			// pid_t pid;
+
 			switch(special) {
-				case 0:  	// no special character
-					cmdChoice(argc, argv);
+				case 0:		// >
+					outputReDir(left, right);
+					// pid = fork();
+					// if(pid==0){ //In child process
+					// 	execvp(argv[0], argv);
+					// 	printf("This will not be printed if the execlp call succeeds\n");
+					// }
+					// else{ // In parent process
+					// 	printf("you are in the parent process\n");
+					// 	waitpid(pid,NULL, 0);
+					// }
 					break;
-				case 1:		// >
-					pid_t pid=fork();
-					if(pid==0){ //In child process
-						execlp("./outputReDir", "./outputReDir", NULL);
-						printf("This will not be printed if the execlp call succeeds\n");
-					}
-					else{ // In parent process
-						printf("you are in the parent process\n");
-						waitpid(pid,NULL, 0);
-					}
-					break;
-				case 2:		// >>
+				case 1:		// >>
 					printf("printf append\n");
 					break;
-				case 3:		// <
+				case 2:		// <
 					printf("input redir\n");
 					break;
-				case 4:		// |
+				case 3:		// |
 					printf("pipe\n");
 					break;
-				case 5:		// &
+				case 4:		// &
 					printf("background\n");
 					break;
-				default:
-					printf("error\n");
-					exit(1);
+				default:  // No speical character
+					cmdChoice(argc, argv);
 				}
 
 			// cmdChoice(argc, argv);
@@ -174,7 +213,7 @@ void shellEnvir(){  // sets the shell environment variable to the path which it 
 	// Prints the prompt.  appears whenever the shell is ready to recieve input
 void prompt(){	
 		/* Printing */
-	printf(ANSI_COLOR_CYAN_BOLD "kenny-shell" ANSI_COLOR_RESET);  // Prints the name of the shell
+	printf(ANSI_COLOR_CYAN_BOLD "%s@kshell" ANSI_COLOR_RESET, getenv("USER"));  // Prints the name of the shell
 	printf(":");
 	printf(ANSI_COLOR_YELLOW_BOLD "%s%s " ANSI_COLOR_RESET,  relpath(getenv("PWD")),pathTrim(getenv("PWD"))); // Prints relative directory 
 	printf("$ ");
@@ -265,6 +304,7 @@ char *cmdChoice(int argc, char **argv){
 	}
 	else if(strcmp(argv[0], "ls") == 0){ // ls
 		ls(argc, argv);
+		printf("\n");
 	}
 	else if(strcmp(argv[0], "pause") == 0){ // pause
 		usrPause();
@@ -279,4 +319,3 @@ char *cmdChoice(int argc, char **argv){
 		printf(" to view manual\n");
 	}
 }
-

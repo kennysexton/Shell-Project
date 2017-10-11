@@ -53,8 +53,8 @@ char *dir(int argc, char **argv){
 			while ((dir = readdir(d)) != NULL){
 				printf("%s\n", dir->d_name);
 			}
+		closedir(d);	
 		}
-		closedir(d);
 	}
 	else{
 		printf(ANSI_COLOR_BRIGHT_RED "Invalid path: " ANSI_COLOR_RESET);			
@@ -130,7 +130,7 @@ char *ls(){ // slightly modified dir command
 			printf("%s ", dir->d_name);
 		}
 	}
-	printf("\n");
+	// printf("\n");
 	closedir(d);
 	return 0;
 }
