@@ -156,7 +156,6 @@ int main() {
 
 					for(j = specialpos + 1; j < argc; j++){ // fill right
 						right[i] = argv[j];
-						printf("%s\n", right[i]);
 						i++;
 					}
 				}
