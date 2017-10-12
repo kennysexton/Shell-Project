@@ -106,7 +106,7 @@ void help(){
 
 				// printf("Space result: %s\n", space);
 
-				if (strcmp(space, " \n") == 0){ // If user entered space, display 25 more
+				if (strcmp(space, " \n") == 0 || strcmp(space, "\n") == 0){ // If user entered space, display 25 more
 					numLines = 0;
 				}
 				else {
@@ -167,4 +167,42 @@ char *upOne(char **argv){ //used in CD
 	
 	strncpy(parentPath, path, parentLength); // cuts of the last / and beyond
 	return  parentPath;	
+}
+
+	// uses a command based on input
+char *cmdChoice(int argc, char **argv){
+	if(strcmp(argv[0], "cd") == 0){  // cd
+		cd(argc, argv);
+	}
+	else if(strcmp(argv[0], "clr") == 0 || strcmp(argv[0], "clear") == 0) {  //clear
+		clear();
+	}
+	else if(strcmp(argv[0], "dir") == 0){ // dir
+		dir(argc, argv);	
+	}
+	else if (strcmp(argv[0], "environ") == 0){ // environ
+		environls();
+	}
+	else if (strcmp(argv[0], "echo") == 0){ // echo 	
+		echo(argc, argv);
+	}
+	else if(strcmp(argv[0], "help") == 0){ // help
+		help();
+	}
+	else if(strcmp(argv[0], "ls") == 0){ // ls
+		ls(argc, argv);
+		printf("\n");
+	}
+	else if(strcmp(argv[0], "pause") == 0){ // pause
+		usrPause();
+	}
+	else if(strcmp(argv[0], "pwd") == 0){  //pwd
+		printf("%s\n", getenv("PWD"));
+	}
+	else{
+		printf(ANSI_COLOR_BRIGHT_RED "Invalid Command: " ANSI_COLOR_RESET);
+		printf("type "); 
+		printf(ANSI_COLOR_BIRGHT_BLUE "help" ANSI_COLOR_RESET);
+		printf(" to view manual\n");
+	}
 }

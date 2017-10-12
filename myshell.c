@@ -32,9 +32,6 @@ char *cmdChoice(int argc, char **argv);
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <sys/wait.h>
-#include <sys/types.h>
 #include "commands.h"  // commands.c  contains built ins
 #include "utility.h"  // utiliy.c contains io modifier code and & code
 
@@ -45,12 +42,11 @@ char *cmdChoice(int argc, char **argv);
 #define ANSI_COLOR_BRIGHT_RED "\033[1m\033[31m"
 #define ANSI_COLOR_RESET  "\033[0m"
 
+	/* Defines */
 #define TRUE 1
 #define FALSE 0
 
-/* Globals */
-
-
+	/* Globals */
 
 	/* Main Function */
 int main() {
@@ -141,25 +137,27 @@ int main() {
 			 	else if (strcmp(argv[i], "&") == 0){
 			 		special = 4;
 			 		specialpos = i;
-			 		ioredirect = TRUE;
+			 		ioredirect = FALSE;
 			 	}
 			}
-
 
 			/* ----------------------------------- Left Right Split ------------------------------------ */
 			if (ioredirect == TRUE){
 
 					/* Checks */
-				if (argc - 1 == specialpos && special!= 4){  // modifiers > >> < | require arguments on both sides of modifier
+				if (argc - 1 == specialpos){  // modifiers > >> < | require arguments on both sides of modifier
 					special = 5;  // set to error
 				}
 				else{
-					for(i=0; i< specialpos; i++){
+					for(i=0; i< specialpos; i++){ // fill left
 						left[i] = argv[i];
 					}
-					for(j = specialpos + 1; j < argc ; j++){
-						right[j] = argv[j];
-						printf("%s\n", right[j]);
+					i=0;
+
+					for(j = specialpos + 1; j < argc; j++){ // fill right
+						right[i] = argv[j];
+						printf("%s\n", right[i]);
+						i++;
 					}
 				}
 
@@ -173,16 +171,8 @@ int main() {
 
 			switch(special) {
 				case 0:		// >
-					outputReDir(left, right);
-					// pid = fork();
-					// if(pid==0){ //In child process
-					// 	execvp(argv[0], argv);
-					// 	printf("This will not be printed if the execlp call succeeds\n");
-					// }
-					// else{ // In parent process
-					// 	printf("you are in the parent process\n");
-					// 	waitpid(pid,NULL, 0);
-					// }
+					outputReDir(left, right, specialpos - 1);
+					
 					break;
 				case 1:		// >>
 					printf("printf append\n");
@@ -296,42 +286,4 @@ char *inputFromFile(){
 
 void exitmsg(){	// Prints a message when user quits or exits
 	printf(ANSI_COLOR_BIRGHT_BLUE "-- exiting kenny-shell --\n" ANSI_COLOR_RESET);
-}
-
-	// uses a command based on input
-char *cmdChoice(int argc, char **argv){
-	if(strcmp(argv[0], "cd") == 0){  // cd
-		cd(argc, argv);
-	}
-	else if(strcmp(argv[0], "clr") == 0 || strcmp(argv[0], "clear") == 0) {  //clear
-		clear();
-	}
-	else if(strcmp(argv[0], "dir") == 0){ // dir
-		dir(argc, argv);	
-	}
-	else if (strcmp(argv[0], "environ") == 0){ // environ
-		environls();
-	}
-	else if (strcmp(argv[0], "echo") == 0){ // echo 	
-		echo(argc, argv);
-	}
-	else if(strcmp(argv[0], "help") == 0){ // help
-		help();
-	}
-	else if(strcmp(argv[0], "ls") == 0){ // ls
-		ls(argc, argv);
-		printf("\n");
-	}
-	else if(strcmp(argv[0], "pause") == 0){ // pause
-		usrPause();
-	}
-	else if(strcmp(argv[0], "pwd") == 0){  //pwd
-		printf("%s\n", getenv("PWD"));
-	}
-	else{
-		printf(ANSI_COLOR_BRIGHT_RED "Invalid Command: " ANSI_COLOR_RESET);
-		printf("type "); 
-		printf(ANSI_COLOR_BIRGHT_BLUE "help" ANSI_COLOR_RESET);
-		printf(" to view manual\n");
-	}
 }
