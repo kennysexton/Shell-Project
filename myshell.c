@@ -27,8 +27,7 @@ int builtinCheck(char **argv);
 
 char *upOne(char **argv); // Handles "cd .." case
 
-	/* Command Choice */
-char *cmdChoice(int argc, char **argv);
+
 
 	/* Includes */
 #include <stdio.h>
@@ -59,7 +58,7 @@ int main() {
 	char **argv;
 	char **left;
 	char **right;
-	int ioredirect;
+	int ioredirect = FALSE;
 	argv = malloc(sizeof(char)* 200);
 	left = malloc(sizeof(char)* 100);
 	right = malloc(sizeof(char)* 100);
@@ -116,7 +115,6 @@ int main() {
 			int specialpos = 0;
 			/* ----------------------------------- Special Cases ----------------------------------- */   // > >> < | & 
 			for (i = 0; i < argc; i++){  // Look at array input
-			 	printf("run: %d   %s\n", i, argv[i]);
 			 	if (strcmp(argv[i], ">") == 0){
 			 		special = 0;
 			 		specialpos = i;
@@ -164,6 +162,10 @@ int main() {
 					}
 				}
 
+			 	for(i=0; i< specialpos; i++){ // fill left
+						printf("%s\n", left[i]);
+				}
+
 
 				// for (i = 0; i < specialpos; i++){ 
 				// 	printf("%s\n", left[i]);
@@ -199,9 +201,6 @@ int main() {
 					cmdChoice(argc, argv);
 				}
 
-			// cmdChoice(argc, argv);
-			
-				
 				// Rest argc and argv	
 			argc = 0;
 			ioredirect = FALSE;

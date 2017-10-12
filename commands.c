@@ -174,7 +174,8 @@ char *upOne(char **argv){ //used in CD
 }
 
 	// uses a command based on input
-void cmdChoice(int argc, char **argv){
+int cmdChoice(int argc, char **argv){
+	int status = 0;
 	if(strcmp(argv[0], "cd") == 0){  // cd
 		cd(argc, argv);
 	}
@@ -208,5 +209,7 @@ void cmdChoice(int argc, char **argv){
 		printf("type "); 
 		printf(ANSI_COLOR_BIRGHT_BLUE "help" ANSI_COLOR_RESET);
 		printf(" to view manual\n");
+		status =  -1;
 	}
+	return status;
 }
