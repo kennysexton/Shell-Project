@@ -19,6 +19,10 @@ char *upOne(char **argv); // Handles "cd .." case
 #define ANSI_COLOR_BRIGHT_RED "\033[1m\033[31m"
 #define ANSI_COLOR_RESET  "\033[0m"
 
+	/* Defines */
+#define TRUE 1
+#define FALSE 0
+
 /*------------------------------ Built ins ------------------------------*/
 void cd(int argc, char **argv){
 	if (argv[1] != NULL){  // print pwd if no argv[1]
@@ -44,7 +48,7 @@ void clear(){
 	//printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 }
 
-char *dir(int argc, char **argv){
+void dir(int argc, char **argv){
 
 	if (chdir(argv[1]) == 0){
 		DIR *d = opendir(argv[1]);
@@ -59,9 +63,9 @@ char *dir(int argc, char **argv){
 	else{
 		printf(ANSI_COLOR_BRIGHT_RED "Invalid path: " ANSI_COLOR_RESET);			
 		printf("dir <path>\n");
-		return 0 ;
+		return;
 	}
-	return 0;
+	return;
 }
 
 void environls(){
@@ -121,7 +125,7 @@ void help(){
 	fclose(rp);	
 }
 
-char *ls(){ // slightly modified dir command
+void *ls(){ // slightly modified dir command
 
 	DIR *d = opendir(getenv("PWD"));
 	struct dirent *dir;
@@ -132,7 +136,7 @@ char *ls(){ // slightly modified dir command
 	}
 	// printf("\n");
 	closedir(d);
-	return 0;
+	
 }
 
 void usrPause(){
@@ -170,7 +174,7 @@ char *upOne(char **argv){ //used in CD
 }
 
 	// uses a command based on input
-char *cmdChoice(int argc, char **argv){
+void cmdChoice(int argc, char **argv){
 	if(strcmp(argv[0], "cd") == 0){  // cd
 		cd(argc, argv);
 	}

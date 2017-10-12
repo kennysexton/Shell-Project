@@ -13,6 +13,8 @@ void exitmsg(); // quit or exit command
 	/* Batch File */
 char *inputFromFile();
 
+int builtinCheck(char **argv);
+
 	/* Build Ins */
 // void cd(int argc, char **argv);  // cd command
 // void clear(); // clr command
@@ -53,6 +55,7 @@ int main() {
 
 	int i, j;
 	int special;
+	int builtin = 0;
 	char **argv;
 	char **left;
 	char **right;
@@ -109,6 +112,7 @@ int main() {
 				// printf("%s %s %d\n", token, argv[argc], argc);
 			}
 			
+			builtin = builtinCheck(argv);
 			int specialpos = 0;
 			/* ----------------------------------- Special Cases ----------------------------------- */   // > >> < | & 
 			for (i = 0; i < argc; i++){  // Look at array input
@@ -170,7 +174,7 @@ int main() {
 
 			switch(special) {
 				case 0:		// >
-					outputReDir(left, right, specialpos - 1);
+					outputReDir(left, right, specialpos - 1, builtin);
 					
 					break;
 				case 1:		// >>
@@ -285,4 +289,37 @@ char *inputFromFile(){
 
 void exitmsg(){	// Prints a message when user quits or exits
 	printf(ANSI_COLOR_BIRGHT_BLUE "-- exiting kenny-shell --\n" ANSI_COLOR_RESET);
+}
+
+int builtinCheck(char **argv){
+	if(strcmp(argv[0], "cd") == 0){  // cd
+		return TRUE;
+	}
+	else if(strcmp(argv[0], "clr") == 0 || strcmp(argv[0], "clear") == 0) {  //clear
+		return TRUE;
+	}
+	else if(strcmp(argv[0], "dir") == 0){ // dir
+		return TRUE;	
+	}
+	else if (strcmp(argv[0], "environ") == 0){ // environ
+		return TRUE;
+	}
+	else if (strcmp(argv[0], "echo") == 0){ // echo 	
+		return TRUE;
+	}
+	else if(strcmp(argv[0], "help") == 0){ // help
+		return TRUE;
+	}
+	else if(strcmp(argv[0], "ls") == 0){ // ls
+		return TRUE;
+	}
+	else if(strcmp(argv[0], "pause") == 0){ // pause
+		return TRUE;
+	}
+	else if(strcmp(argv[0], "pwd") == 0){  //pwd
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
 }

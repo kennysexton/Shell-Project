@@ -14,9 +14,12 @@
 #define READ 0
 #define WRITE 1
 
+#define TRUE 1
+#define FALSE 0
+
 int fd[2];
 
-int outputReDir(char **left, char **right, int leftSize){
+int outputReDir(char **left, char **right, int leftSize, int builtin){
 	FILE *fp;
 	char *str;
 		
@@ -25,29 +28,35 @@ int outputReDir(char **left, char **right, int leftSize){
 		if (strstr(str, ".txt") == NULL){ // adds a .txt ending if none is present
 			strcat(str, ".txt");
 		}
-		//if ((fp= fopen(str , "w")) != NULL){
+		
 
-			printf("%s\n", str);
+		printf("%s\n", str);
+		int file = open(str, O_WRONLY | O_CREAT | O_EXCL, 0666);
 
+		if (builtin == FALSE){
 			pid_t pid=fork();
 			if(pid==0){ //In child process
-				
-				int file = open(str, O_WRONLY | O_CREAT | O_EXCL, 0666);
 				
 				printf("command: %s", left[0]);
 				dup2(file, 1);
 				execvp(left[0], left);
-
-				// cmdChoice(leftSize, left);
 				
 				printf("This will not be printed if the execlp call succeeds\n");
 			}
 			else{ // In parent process
-				//printf("you are in the parent process\n");
 				waitpid(pid,NULL, 0);
 			}
-		}
+		} 
+		else {
+			int saved_stdout;
 
-		//fclose(fp);
-	
+			saved_stdout = dup (1);
+			dup2(file, 1);
+			cmdChoice(leftSize, left);
+
+			dup2(saved_stdout, 1);
+			close(saved_stdout);
+		}
+	}
+		//fclose(fp);	
 }
