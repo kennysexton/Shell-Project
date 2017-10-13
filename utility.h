@@ -3,5 +3,6 @@
 
 void outputReDir(char **left, char **right, int leftSize, int builtin);
 void append(char **left, char **right, int leftSize, int builtin);
+void inputReDir(char **left, char **right, int leftSize, int builtin);
 
 #endif // UTILITY_H_

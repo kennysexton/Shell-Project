@@ -176,7 +176,7 @@ int main() {
 					append(left, right, specialpos, builtin);
 					break;
 				case 2:		// <
-					printf("input redir\n");
+					inputReDir(left, right, specialpos, builtin);
 					break;
 				case 3:		// |
 					printf("pipe\n");

@@ -2,6 +2,9 @@
 // CIS 3207
 // Project 2
 
+	/* Functions */
+void printError();
+
 	/* Includes */
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,9 +32,8 @@
 int fd[2];
 
 void outputReDir(char **left, char **right, int leftSize, int builtin){  // if the '>' character is used correctly then this function will execute
-	FILE *fp;
+
 	char *str;
-	int status;
 		
 	if (right[0] != NULL){
 		str = right[0];
@@ -45,14 +47,18 @@ void outputReDir(char **left, char **right, int leftSize, int builtin){  // if t
 			pid_t pid=fork();
 			if(pid==0){ //In child process
 				
+				int saved_stdout; // save state
+				saved_stdout = dup (1);
+
 				dup2(file, 1);
 				execvp(left[0], left);  // execs from /bin
 
+				dup2(saved_stdout, 1);  // returns back to normal stdout
+				close(saved_stdout);
+
 					// Printed only if exec fails
-				printf(ANSI_COLOR_BRIGHT_RED "Invalid Command: " ANSI_COLOR_RESET);  
-				printf("type "); 
-				printf(ANSI_COLOR_BIRGHT_BLUE "help" ANSI_COLOR_RESET);
-				printf(" to view manual\n");
+				printError();
+
 			}
 
 			else{ // In parent process
@@ -75,9 +81,7 @@ void outputReDir(char **left, char **right, int leftSize, int builtin){  // if t
 
 void append(char **left, char **right, int leftSize, int builtin){
 
-	FILE *fp;
 	char *str;
-	int status;
 		
 	if (right[0] != NULL){
 		str = right[0];
@@ -88,21 +92,25 @@ void append(char **left, char **right, int leftSize, int builtin){
 		int file = open(str, O_WRONLY|O_APPEND | O_CREAT, 0777);
 
 		if (builtin == FALSE){  // If the user is not using one of my built in commands
-			pid_t pid=fork();
-			if(pid==0){ //In child process
+			pid_t pid2=fork();
+			if(pid2==0){ //In child process
 				
+				int saved_stdout;
+				saved_stdout = dup (1);
+
 				dup2(file, 1);
 				execvp(left[0], left);  // execs from /bin
 
+
+				dup2(saved_stdout, 1);  // returns back to normal stdout
+				close(saved_stdout);
+
 					// Printed only if exec fails
-				printf(ANSI_COLOR_BRIGHT_RED "Invalid Command: " ANSI_COLOR_RESET);  
-				printf("type "); 
-				printf(ANSI_COLOR_BIRGHT_BLUE "help" ANSI_COLOR_RESET);
-				printf(" to view manual\n");
+				printError();
 			}
 
 			else{ // In parent process
-				waitpid(pid,NULL, 0);
+				waitpid(pid2,NULL, 0);
 			}
 		} 
 		else {  // One of my built in commands is being used
@@ -117,4 +125,51 @@ void append(char **left, char **right, int leftSize, int builtin){
 			close(saved_stdout);	
 		}
 	}	
+}
+
+void inputReDir(char **left, char **right, int leftSize, int builtin){
+
+	char *str;
+	// char *read;
+	// read = malloc(sizeof(char)* 100);
+	char buffer[100];
+
+	str = right[0];
+
+	if(leftSize == 0){
+		
+	}
+
+	int file = open(str, O_RDONLY);
+
+	if (file == -1){  // if open call fails
+		printf(ANSI_COLOR_BRIGHT_RED "File not found: " ANSI_COLOR_RESET);  
+		printf("type "); 
+		printf(ANSI_COLOR_BIRGHT_BLUE "help" ANSI_COLOR_RESET);
+		printf(" to view manual\n");
+	}
+	else {
+		read(file, buffer, 100);
+		write(1,buffer , 100);
+
+		char *token;
+		char flags[] = {' ', '-', '\n'};
+
+		token = strtok(buffer, flags);
+		left[1] = token;
+
+		printf("%s\n", left[1]);
+			
+
+		//printf("%s\n", left);
+	}
+	// free(read);
+}
+
+
+void printError(){
+	printf(ANSI_COLOR_BRIGHT_RED "Invalid Command: " ANSI_COLOR_RESET);  
+	printf("type "); 
+	printf(ANSI_COLOR_BIRGHT_BLUE "help" ANSI_COLOR_RESET);
+	printf(" to view manual\n");	
 }
