@@ -121,7 +121,6 @@ int main() {
 			 		ioredirect = TRUE;
 			 	}
 			 	else if (strcmp(argv[i], ">>") == 0){
-			 		printf(">> input redirection append\n");
 			 		special = 1;
 			 		specialpos = i;
 			 		ioredirect = TRUE;
@@ -162,11 +161,6 @@ int main() {
 					}
 				}
 
-			 	for(i=0; i< specialpos; i++){ // fill left
-						printf("%s\n", left[i]);
-				}
-
-
 				// for (i = 0; i < specialpos; i++){ 
 				// 	printf("%s\n", left[i]);
 
@@ -176,11 +170,10 @@ int main() {
 
 			switch(special) {
 				case 0:		// >
-					outputReDir(left, right, specialpos - 1, builtin);
-					
+					outputReDir(left, right, specialpos, builtin);
 					break;
 				case 1:		// >>
-					printf("printf append\n");
+					append(left, right, specialpos, builtin);
 					break;
 				case 2:		// <
 					printf("input redir\n");
