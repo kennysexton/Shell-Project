@@ -54,6 +54,7 @@ int main() {
 
 	int i, j;
 	int special;
+	int background = 0;
 	int builtin = 0;
 	char **argv;
 	char **left;
@@ -111,10 +112,25 @@ int main() {
 				// printf("%s %s %d\n", token, argv[argc], argc);
 			}
 			
-			builtin = builtinCheck(argv);
 			int specialpos = 0;
+
+			builtin = builtinCheck(argv);
+
+			// if (builtin == FALSE){
+			// 	specialpos = 4;
+			// }
+			
+			/* ----------------------------------- & ------------------------------------ */
+			if (strcmp(argv[argc - 1], "&") == 0){  // test for timinating background char &
+			 		background = TRUE;
+			 		printf("test1\n");
+			 		argv[argc -1] = " ";  // Remove the & character, Don't need it anymore
+
+			 }
+
+
 			/* ----------------------------------- Special Cases ----------------------------------- */   // > >> < | & 
-			for (i = 0; i < argc; i++){  // Look at array input
+			for (i = 0; i < argc ; i++){  // Look at array input
 			 	if (strcmp(argv[i], ">") == 0){
 			 		special = 0;
 			 		specialpos = i;
@@ -134,11 +150,6 @@ int main() {
 			 		special = 3;
 			 		specialpos = i;
 			 		ioredirect = TRUE;
-			 	}
-			 	else if (strcmp(argv[i], "&") == 0){
-			 		special = 4;
-			 		specialpos = i;
-			 		ioredirect = FALSE;
 			 	}
 			}
 
@@ -160,29 +171,22 @@ int main() {
 						i++;
 					}
 				}
-
-				// for (i = 0; i < specialpos; i++){ 
-				// 	printf("%s\n", left[i]);
-
-				// }
 			}
-			// pid_t pid;
 
 			switch(special) {
 				case 0:		// >
-					outputReDir(left, right, specialpos, builtin);
+					outputReDir(left, right, specialpos, builtin, background);
 					break;
 				case 1:		// >>
-					append(left, right, specialpos, builtin);
+					append(left, right, specialpos, builtin, background);
 					break;
 				case 2:		// <
-					inputReDir(left, right, specialpos, builtin);
+					inputReDir(left, right, specialpos, builtin, background);
 					break;
 				case 3:		// |
 					printf("pipe\n");
 					break;
-				case 4:		// &
-					printf("background\n");
+				case 4:		// & Moved code
 					break;
 				case 5: // error
 					printf(ANSI_COLOR_BRIGHT_RED "Misuse of modifier: " ANSI_COLOR_RESET);
@@ -191,19 +195,23 @@ int main() {
 					printf(" to view manual\n");
 					break;
 				default:  // No speical character
+					printf("test2\n");
 					cmdChoice(argc, argv);
 				}
 
 				// Rest argc and argv	
 			argc = 0;
 			ioredirect = FALSE;
+			background = FALSE;
 			for (i = 0; i < argc; i++){
 				argv[i] = NULL;
 			}
 		}
 	}
 	exitmsg(); // Messege on quit
-	free(argv);	
+	free(argv);
+	free(left);
+	free(right);	
 }
 
 /*---------------------------------------------------------Functions---------------------------------------------------------*/

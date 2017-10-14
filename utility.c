@@ -13,6 +13,7 @@ void printError();
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <fcntl.h>
+#include <signal.h>
 #include "commands.h"
 
 	/* Colors */
@@ -31,7 +32,7 @@ void printError();
 
 int fd[2];
 
-void outputReDir(char **left, char **right, int leftSize, int builtin){  // if the '>' character is used correctly then this function will execute
+void outputReDir(char **left, char **right, int leftSize, int builtin, int background){  // if the '>' character is used correctly then this function will execute
 
 	char *str;
 		
@@ -58,28 +59,55 @@ void outputReDir(char **left, char **right, int leftSize, int builtin){  // if t
 
 					// Printed only if exec fails
 				printError();
-
 			}
 
 			else{ // In parent process
-				waitpid(pid,NULL, 0);
+				
+				if (background == TRUE){ // if & symbol DO NOT WAIT
+					; // No waiting
+				}
+				else {
+					waitpid(pid,NULL, 0);  // wait if no & symbol at end
+				}
+				
 			}
 		} 
-		else {  // One of my built in commands is being used
-			int saved_stdout;
-			saved_stdout = dup (1);
+		else {  // One of my builtin commands is being used
+			
+				/******* Background Operation ******/
+			if (background == TRUE){  // if there is an &
+				pid_t pid=fork();
+				
+				if (pid==0){ // in child
+					int saved_stdout;
+					saved_stdout = dup (1);
 
-			dup2(file, 1);  // output redirection
+					dup2(file, 1);  // output redirection
 
-			cmdChoice(leftSize, left);
+					cmdChoice(leftSize, left);
+					_exit(0);  // child exits when done
+				}
+				else {
+					; // don't wait
+				}
+				/************* end *************/
+			}
+			else {  // No & symbol
+				int saved_stdout;
+				saved_stdout = dup (1);
 
-			dup2(saved_stdout, 1);  // returns back to normal stdout
-			close(saved_stdout);	
+				dup2(file, 1);  // output redirection
+
+				cmdChoice(leftSize, left);
+
+				dup2(saved_stdout, 1);  // returns back to normal stdout
+				close(saved_stdout);
+			}	
 		}
 	}	
 }
 
-void append(char **left, char **right, int leftSize, int builtin){
+void append(char **left, char **right, int leftSize, int builtin){	// if the '>>' character is used correctly then this function will execute
 
 	char *str;
 		
@@ -124,7 +152,7 @@ void append(char **left, char **right, int leftSize, int builtin){
 			dup2(saved_stdout, 1);  // returns back to normal stdout
 			close(saved_stdout);	
 		}
-	}	
+	}		
 }
 
 void inputReDir(char **left, char **right, int leftSize, int builtin){
@@ -132,7 +160,6 @@ void inputReDir(char **left, char **right, int leftSize, int builtin){
 	char *str;
 	char buffer[100];
 	int pos = 2;
-
 	str = right[0];
 
 	if(leftSize == 0){ // no left hand argument
@@ -157,7 +184,7 @@ void inputReDir(char **left, char **right, int leftSize, int builtin){
 			token = strtok(buffer, flags);
 			left[1] = token;
 
-			while (token != NULL){		
+			while (token != NULL){
 					token = strtok(NULL, flags);
 					left[pos] = token;
 					pos++;
@@ -180,7 +207,6 @@ void inputReDir(char **left, char **right, int leftSize, int builtin){
 
 			//printf("%s\n", left);
 		}
-
 	}
 }
 
