@@ -92,8 +92,8 @@ void append(char **left, char **right, int leftSize, int builtin){
 		int file = open(str, O_WRONLY|O_APPEND | O_CREAT, 0777);
 
 		if (builtin == FALSE){  // If the user is not using one of my built in commands
-			pid_t pid2=fork();
-			if(pid2==0){ //In child process
+			pid_t pid=fork();
+			if(pid==0){ //In child process
 				
 				int saved_stdout;
 				saved_stdout = dup (1);
@@ -110,7 +110,7 @@ void append(char **left, char **right, int leftSize, int builtin){
 			}
 
 			else{ // In parent process
-				waitpid(pid2,NULL, 0);
+				waitpid(pid,NULL, 0);
 			}
 		} 
 		else {  // One of my built in commands is being used
@@ -130,42 +130,59 @@ void append(char **left, char **right, int leftSize, int builtin){
 void inputReDir(char **left, char **right, int leftSize, int builtin){
 
 	char *str;
-	// char *read;
-	// read = malloc(sizeof(char)* 100);
 	char buffer[100];
+	int pos = 2;
 
 	str = right[0];
 
-	if(leftSize == 0){
-		
-	}
-
-	int file = open(str, O_RDONLY);
-
-	if (file == -1){  // if open call fails
-		printf(ANSI_COLOR_BRIGHT_RED "File not found: " ANSI_COLOR_RESET);  
-		printf("type "); 
-		printf(ANSI_COLOR_BIRGHT_BLUE "help" ANSI_COLOR_RESET);
-		printf(" to view manual\n");
+	if(leftSize == 0){ // no left hand argument
+		printError();
 	}
 	else {
-		read(file, buffer, 100);
-		write(1,buffer , 100);
+		int file = open(str, O_RDONLY);
 
-		char *token;
-		char flags[] = {' ', '-', '\n'};
+		if (file == -1){  // if open call fails
+			printf(ANSI_COLOR_BRIGHT_RED "File not found: " ANSI_COLOR_RESET);  
+			printf("type "); 
+			printf(ANSI_COLOR_BIRGHT_BLUE "help" ANSI_COLOR_RESET);
+			printf(" to view manual\n");
+		}
+		else {
+			read(file, buffer, 100);
+			//write(1,buffer , 100);
 
-		token = strtok(buffer, flags);
-		left[1] = token;
+			char *token;
+			char flags[] = {' ', '-', '\n'};
 
-		printf("%s\n", left[1]);
-			
+			token = strtok(buffer, flags);
+			left[1] = token;
 
-		//printf("%s\n", left);
+			while (token != NULL){		
+					token = strtok(NULL, flags);
+					left[pos] = token;
+					pos++;
+			}
+			if (builtin == FALSE){
+				pid_t pid=fork();
+				if(pid==0){ //In child process
+				
+					execvp(left[0], left);  // execs from /bin
+						// Printed only if exec fails
+					printError();
+				}
+				else{ // In parent process
+					waitpid(pid,NULL, 0);
+				}
+			}
+			else {
+				cmdChoice(pos -1 , left);
+			}
+
+			//printf("%s\n", left);
+		}
+
 	}
-	// free(read);
 }
-
 
 void printError(){
 	printf(ANSI_COLOR_BRIGHT_RED "Invalid Command: " ANSI_COLOR_RESET);  
