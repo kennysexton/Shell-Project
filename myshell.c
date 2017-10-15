@@ -16,6 +16,8 @@ char *inputFromFile();
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include "commands.h"  // commands.c  contains built ins
 #include "utility.h"  // utiliy.c contains io modifier code and & code
 
@@ -74,7 +76,7 @@ int main() {
 		else {
 
 			char *token;
-			char flags[] = {' ', '-', '\n'};
+			char flags[] = {' ', '\n'};
 
 			if(strcmp(lineInput, batchfile) == 0){ // if User types "myshell batchfile"
 				strcpy(fileInput,inputFromFile());
@@ -180,7 +182,25 @@ int main() {
 					printf(" to view manual\n");
 					break;
 				default:  // No speical character
-					cmdChoice(argc, argv);
+					if (background == FALSE){
+						cmdChoice(argc, argv);
+					} 
+					else { // run in background
+						pid_t pid=fork();
+				
+						if (pid==0){ // in child
+
+						int saved_stdout;
+						saved_stdout = dup (1);
+
+						close(1); // close stdout
+						cmdChoice(argc, argv);
+
+						dup2(saved_stdout, 1);  // returns back to normal stdout
+						close(saved_stdout);
+						_exit(0);  // child exits when done
+						}
+					}
 				}
 
 			/* ----------------------------------- Reset ------------------------------------ */	
@@ -200,6 +220,7 @@ int main() {
 /*---------------------------------------------------------Functions---------------------------------------------------------*/
 void shellEnvir(){  // sets the shell environment variable to the path which it was executed
 	setenv("SHELL", getenv("PWD"), 1);
+	setenv("PARENT", getenv("PWD"), 1);
 }
 
 	// Prints the prompt.  appears whenever the shell is ready to recieve input

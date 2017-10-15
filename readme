@@ -1,36 +1,70 @@
--------------------------------------------------------
-kshell manual
+				kshell manual
+---------------------------------------------------------------
 Type 'help' to see this list
--------------------------------------------------------
+---------------------------------------------------------------
 
-			Commands
-========================================================
+				Commands
+===============================================================
 cd [path]
-Used to change the current directory
+	Used to change the current directory.  
+	If path is not specified, the current directory will
+	be returned.
 
-clear
-clears the screen
+clear or clr
+	clears the screen of all prior information.
 
 dir [path]
-Will list all of the files in the specified directory
+	Will list all of the files in the specified directory.
 
 environ
-List all of environment strings
+	List all of environment strings
 
 echo [comment]
-Display a line of text 
+	Displays the comment following echo
+
+exit
+	exits the shell	
 
 help
-displays this manual
-
-ls
-List the files in the current directory
+	displays this manual
 
 pause
-Stops the program until a character is entered
+	Temporarily stops the program until a character is entered
 
 pwd
-Shows the current working directory
+	Shows the current working directory
 
 quit
-exits the shell
+	exits the shell
+
+				i/o Redirection
+===============================================================
+
+-----  Batchfile
+myshell batchfile
+	Will direct the shell to read commands from a 'batchfile' 
+	in the project directory
+
+-----  Output Redirection
+[command] [arguments] > [file]
+	the result of command on (optional) arguments will appear in
+	a file located at the current directory.
+
+	ex.) echo Hello World > myfile
+
+-----  Output Append
+[command] [arguments] >> [file]
+	the result of command on (optional) arguments will appear in
+	a file located at the current directory.  If the document 
+	already exists.  The result will apend to the file.
+
+	ex.) echo This will appear in a file 'cats' >> cat
+
+-----  Input Redirection
+[command] < [file]
+	command will execute with the arguments provided from the file
+
+	ex.) echo < readfile
+
+-----  Pipe
+[command] [arguments] | [command] [arguments]

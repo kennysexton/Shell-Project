@@ -204,10 +204,8 @@ void inputReDir(char **left, char **right, int leftSize, int builtin, int backgr
 		}
 	}
 }
-/* 	4 Cases
-*  1.) Left = False & Right = False
-*  2.)
-*/
+
+
 void mypipe(char **left, char **right, int leftSize, int builtin, int background){
 
 	pid_t pid;
@@ -296,7 +294,6 @@ void mypipe(char **left, char **right, int leftSize, int builtin, int background
 void systemcommand(char **argv, int background){
 	pid_t pid=fork();
 	if(pid==0){ //In child process
-
 		execvp(argv[0], argv);  // execs from /bin
 			// Printed only if exec fails
 		printError();
