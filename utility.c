@@ -31,6 +31,8 @@ void systemcommand(char **argv, int background);
 #define TRUE 1
 #define FALSE 0
 
+#define BUF_SIZE 64
+
 int fd[2];
 
 void outputReDir(char **left, char **right, int leftSize, int builtin, int background){  // if the '>' character is used correctly then this function will execute
@@ -163,8 +165,8 @@ void inputReDir(char **left, char **right, int leftSize, int builtin, int backgr
 			printf(ANSI_COLOR_BIRGHT_BLUE "help" ANSI_COLOR_RESET);
 			printf(" to view manual\n");
 		}
-		else {
-			read(file, buffer, 100);
+		else {  // file was found
+			read(file, buffer, 100);  // read to a buffer
 			//write(1,buffer , 100);
 
 			char *token;
@@ -199,8 +201,55 @@ void inputReDir(char **left, char **right, int leftSize, int builtin, int backgr
 					cmdChoice(pos -1 , left);
 				}
 			}
+		}
+	}
+}
+/* 	4 Cases
+*  1.) Left = False & Right = False
+*  2.)
+*/
+void mypipe(char **left, char **right, int leftSize, int builtin, int background){
 
-			//printf("%s\n", left);
+	pid_t pid;
+	int fd[2];
+	char buf[BUF_SIZE];
+	int bytes_read;
+	
+	// Case 1
+	pid_t pid1=fork();
+	if (pid1==0){ // in child
+		if (builtin == FALSE){
+			if(pipe(fd)==-1){
+				printf("piper error\n");
+				return;
+			}
+
+			if((pid=fork()) == -1) {
+				printf("fork Error\n");
+				return;
+			}
+			else if (pid==0){
+				close(1);
+				dup2(fd[WRITE], 1);
+				close(fd[READ]);
+				execvp(left[0], left);
+			}
+			else {
+				close(0);
+				dup2(fd[READ], STDIN_FILENO);
+				close(fd[WRITE]);
+				execvp(right[0], right);
+			}		
+		// } else {
+		printf("bananas\n");
+		 }
+	}
+	else { // in parent
+		if (background == TRUE){ // if & symbol DO NOT WAIT
+			; // No waiting
+		}
+		else {
+			waitpid(pid,NULL, 0);
 		}
 	}
 }

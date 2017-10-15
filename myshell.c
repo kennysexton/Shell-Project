@@ -61,7 +61,7 @@ int main() {
 	shellEnvir();
 	system("clear");  // Use System clear to give the shell a clean look on startup
 
-	while( strcmp(lineInput, "quit") != 0 && strcmp(lineInput, "exit") != 0){ // exit the program by typing "quit","exit" or using your escape command ex. ctrl^c
+	while(1){ // exit the program by typing "quit","exit" or using your escape command ex. ctrl^c
 
 		prompt();	
 		special = -1;
@@ -170,7 +170,8 @@ int main() {
 					inputReDir(left, right, specialpos, builtin, background);
 					break;
 				case 3:		// |
-					printf("pipe\n");
+					mypipe(left, right, specialpos, builtin, background);
+					printf("made it out\n");
 					break;
 				case 4:
 					systemcommand(argv, background);
