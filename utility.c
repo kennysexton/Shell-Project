@@ -46,14 +46,12 @@ void outputReDir(char **left, char **right, int leftSize, int builtin, int backg
 		int file = open(str, O_WRONLY | O_CREAT | O_EXCL, 0777);
 
 		if (builtin == FALSE){  // If the user is not using one of my built in commands
-			// pid_t pid=fork();
-			// if(pid==0){ //In child process
-				
+
 				int saved_stdout; // save state
 				saved_stdout = dup (1);
 
 				dup2(file, 1);
-				systemcommand(left, background);  // execs from /bin
+				systemcommand(left, background);	// where fork and exec are done
 
 				dup2(saved_stdout, 1);  // returns back to normal stdout
 				close(saved_stdout);
@@ -104,31 +102,15 @@ void append(char **left, char **right, int leftSize, int builtin, int background
 		int file = open(str, O_WRONLY|O_APPEND | O_CREAT, 0777);
 
 		if (builtin == FALSE){  // If the user is not using one of my built in commands
-			pid_t pid=fork();
-			if(pid==0){ //In child process
-				
-				int saved_stdout;
-				saved_stdout = dup (1);
+			
+			int saved_stdout;
+			saved_stdout = dup (1);
 
-				dup2(file, 1);
-				execvp(left[0], left);  // execs from /bin
+			dup2(file, 1);
+			systemcommand(left, background);  // where fork and exec are done
 
-
-				dup2(saved_stdout, 1);  // returns back to normal stdout
-				close(saved_stdout);
-
-					// Printed only if exec fails
-				printError();
-			}
-
-			else{ // In parent process
-				if (background == TRUE){ // if & symbol DO NOT WAIT
-					; // No waiting
-				}
-				else {
-					waitpid(pid,NULL, 0);
-				}
-			}
+			dup2(saved_stdout, 1);  // returns back to normal stdout
+			close(saved_stdout);
 		} 
 		else {  // One of my built in commands is being used
 				
@@ -197,21 +179,7 @@ void inputReDir(char **left, char **right, int leftSize, int builtin, int backgr
 					pos++;
 			}
 			if (builtin == FALSE){
-				pid_t pid=fork();
-				if(pid==0){ //In child process
-				
-					execvp(left[0], left);  // execs from /bin
-						// Printed only if exec fails
-					printError();
-				}
-				else{ // In parent process
-					if (background == TRUE){ // if & symbol DO NOT WAIT
-						; // No waiting
-					}
-					else {
-						waitpid(pid,NULL, 0);
-					}
-				}
+				systemcommand(left, background);
 			}
 			else {
 					/******* Background Operation ******/
@@ -237,16 +205,15 @@ void inputReDir(char **left, char **right, int leftSize, int builtin, int backgr
 	}
 }
 
+	// Non builtins get executed form /bin
 void systemcommand(char **argv, int background){
 	pid_t pid=fork();
 	if(pid==0){ //In child process
 
 		execvp(argv[0], argv);  // execs from /bin
 			// Printed only if exec fails
-		printf("testpoint\n");
 		printError();
 	}
-
 	else{ // In parent process
 		if (background == TRUE){ // if & symbol DO NOT WAIT
 			; // No waiting

@@ -8,25 +8,12 @@ void prompt();  // Print the prompt
 char * relpath(char *path); // prints ~ if relative path is displayed
 const char * pathTrim(char *path);  // prints path or relative path on prompt
 int checkToken(char* token);
-void exitmsg(); // quit or exit command
 
 	/* Batch File */
 char *inputFromFile();
 
-int builtinCheck(char **argv);
-
-	/* Build Ins */
-// void cd(int argc, char **argv);  // cd command
-// void clear(); // clr command
-// char *dir(int argc, char **argv); // dir command
-// void environls();  // environ command
-// void echo(int argc, char **argv); // echo command
-// char *ls(); // ls command
-// void help(); // help command
-// void usrPause(); // Pause command
-
-char *upOne(char **argv); // Handles "cd .." case
-
+	/* Check */
+int builtinCheck(char **argv);  // check if user typed a builtin
 
 
 	/* Includes */
@@ -56,6 +43,7 @@ int main() {
 	int special;
 	int background = 0;
 	int builtin = 0;
+	int specialpos;
 	char **argv;
 	char **left;
 	char **right;
@@ -111,24 +99,23 @@ int main() {
 				argv[argc] = token;
 				// printf("%s %s %d\n", token, argv[argc], argc);
 			}
-			
-			int specialpos = 0;
 
 			builtin = builtinCheck(argv);
 
-			// if (builtin == FALSE){
-			// 	specialpos = 4;
-			// }
+			if (builtin == FALSE){
+				special = 4;
+			}
 			
 			/* ----------------------------------- & ------------------------------------ */
 			if (strcmp(argv[argc - 1], "&") == 0){  // test for timinating background char &
 			 		background = TRUE;
 			 		argv[argc -1] = " ";  // Remove the & character, Don't need it anymore
-
 			 }
 
 
 			/* ----------------------------------- Special Cases ----------------------------------- */   // > >> < | & 
+			specialpos = 0;
+
 			for (i = 0; i < argc ; i++){  // Look at array input
 			 	if (strcmp(argv[i], ">") == 0){
 			 		special = 0;
@@ -185,7 +172,8 @@ int main() {
 				case 3:		// |
 					printf("pipe\n");
 					break;
-				case 4:		// & Moved code
+				case 4:
+					systemcommand(argv, background);
 					break;
 				case 5: // error
 					printf(ANSI_COLOR_BRIGHT_RED "Misuse of modifier: " ANSI_COLOR_RESET);
@@ -206,10 +194,9 @@ int main() {
 			}
 		}
 	}
-	exitmsg(); // Messege on quit
 	free(argv);
 	free(left);
-	free(right);	
+	free(right);
 }
 
 /*---------------------------------------------------------Functions---------------------------------------------------------*/
@@ -285,10 +272,6 @@ char *inputFromFile(){
 	fclose(rp);
 }
 
-void exitmsg(){	// Prints a message when user quits or exits
-	printf(ANSI_COLOR_BIRGHT_BLUE "-- exiting kenny-shell --\n" ANSI_COLOR_RESET);
-}
-
 int builtinCheck(char **argv){
 	if(strcmp(argv[0], "cd") == 0){  // cd
 		return TRUE;
@@ -305,6 +288,9 @@ int builtinCheck(char **argv){
 	else if (strcmp(argv[0], "echo") == 0){ // echo 	
 		return TRUE;
 	}
+	else if (strcmp(argv[0], "exit") == 0){ // exit 	
+		return TRUE;
+	}
 	else if(strcmp(argv[0], "help") == 0){ // help
 		return TRUE;
 	}
@@ -315,6 +301,9 @@ int builtinCheck(char **argv){
 		return TRUE;
 	}
 	else if(strcmp(argv[0], "pwd") == 0){  //pwd
+		return TRUE;
+	}
+	else if (strcmp(argv[0], "quit") == 0){ // quit	
 		return TRUE;
 	}
 	else {

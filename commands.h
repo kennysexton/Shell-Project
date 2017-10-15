@@ -10,6 +10,6 @@ void *ls();
 void help(); // help command
 void usrPause(); // Pause command
 char *upOne(char **argv); // Handles "cd .." case
-int *cmdChoice(int argc, char **argv); // What command is called
+void *cmdChoice(int argc, char **argv); // What command is called
 
 #endif // COMMANDS_H_

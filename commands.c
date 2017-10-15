@@ -2,8 +2,9 @@
 // CIS 3207
 // Project 2
 
+	/* Functions */
 char *upOne(char **argv); // Handles "cd .." case
-
+void exitmsg();	// quit or exit command
 
 	/* Includes */
 #include <stdio.h>
@@ -133,10 +134,8 @@ void *ls(){ // slightly modified dir command
 		while ((dir = readdir(d)) != NULL){
 			printf("%s ", dir->d_name);
 		}
-	}
-	// printf("\n");
-	closedir(d);
-	
+		closedir(d);
+	}	
 }
 
 void usrPause(){
@@ -174,8 +173,7 @@ char *upOne(char **argv){ //used in CD
 }
 
 	// uses a command based on input
-int cmdChoice(int argc, char **argv){
-	int status = 0;
+void cmdChoice(int argc, char **argv){
 	if(strcmp(argv[0], "cd") == 0){  // cd
 		cd(argc, argv);
 	}
@@ -191,6 +189,10 @@ int cmdChoice(int argc, char **argv){
 	else if (strcmp(argv[0], "echo") == 0){ // echo 	
 		echo(argc, argv);
 	}
+	else if (strcmp(argv[0], "exit") == 0){ // echo 	
+		exitmsg();
+		exit(0);
+	}
 	else if(strcmp(argv[0], "help") == 0){ // help
 		help();
 	}
@@ -204,12 +206,18 @@ int cmdChoice(int argc, char **argv){
 	else if(strcmp(argv[0], "pwd") == 0){  //pwd
 		printf("%s\n", getenv("PWD"));
 	}
+	else if (strcmp(argv[0], "quit") == 0){ // echo 	
+		exitmsg();
+		exit(0);
+	}
 	else{
 		printf(ANSI_COLOR_BRIGHT_RED "Invalid Command: " ANSI_COLOR_RESET);
 		printf("type "); 
 		printf(ANSI_COLOR_BIRGHT_BLUE "help" ANSI_COLOR_RESET);
 		printf(" to view manual\n");
-		status =  -1;
 	}
-	return status;
+}
+
+void exitmsg(){	// Prints a message when user quits or exits
+	printf(ANSI_COLOR_BIRGHT_BLUE "-- exiting kshell --\n" ANSI_COLOR_RESET);
 }
