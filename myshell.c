@@ -123,7 +123,6 @@ int main() {
 			/* ----------------------------------- & ------------------------------------ */
 			if (strcmp(argv[argc - 1], "&") == 0){  // test for timinating background char &
 			 		background = TRUE;
-			 		printf("test1\n");
 			 		argv[argc -1] = " ";  // Remove the & character, Don't need it anymore
 
 			 }
@@ -195,7 +194,6 @@ int main() {
 					printf(" to view manual\n");
 					break;
 				default:  // No speical character
-					printf("test2\n");
 					cmdChoice(argc, argv);
 				}
 

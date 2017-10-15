@@ -4,6 +4,7 @@
 
 	/* Functions */
 void printError();
+void systemcommand(char **argv, int background);
 
 	/* Includes */
 #include <stdio.h>
@@ -45,32 +46,17 @@ void outputReDir(char **left, char **right, int leftSize, int builtin, int backg
 		int file = open(str, O_WRONLY | O_CREAT | O_EXCL, 0777);
 
 		if (builtin == FALSE){  // If the user is not using one of my built in commands
-			pid_t pid=fork();
-			if(pid==0){ //In child process
+			// pid_t pid=fork();
+			// if(pid==0){ //In child process
 				
 				int saved_stdout; // save state
 				saved_stdout = dup (1);
 
 				dup2(file, 1);
-				execvp(left[0], left);  // execs from /bin
+				systemcommand(left, background);  // execs from /bin
 
 				dup2(saved_stdout, 1);  // returns back to normal stdout
 				close(saved_stdout);
-
-					// Printed only if exec fails
-				printError();
-			}
-
-			else{ // In parent process
-				
-				if (background == TRUE){ // if & symbol DO NOT WAIT
-					; // No waiting
-				}
-				else {
-					waitpid(pid,NULL, 0);  // wait if no & symbol at end
-				}
-				
-			}
 		} 
 		else {  // One of my builtin commands is being used
 			
@@ -79,8 +65,6 @@ void outputReDir(char **left, char **right, int leftSize, int builtin, int backg
 				pid_t pid=fork();
 				
 				if (pid==0){ // in child
-					int saved_stdout;
-					saved_stdout = dup (1);
 
 					dup2(file, 1);  // output redirection
 
@@ -107,7 +91,7 @@ void outputReDir(char **left, char **right, int leftSize, int builtin, int backg
 	}	
 }
 
-void append(char **left, char **right, int leftSize, int builtin){	// if the '>>' character is used correctly then this function will execute
+void append(char **left, char **right, int leftSize, int builtin, int background){	// if the '>>' character is used correctly then this function will execute
 
 	char *str;
 		
@@ -138,24 +122,47 @@ void append(char **left, char **right, int leftSize, int builtin){	// if the '>>
 			}
 
 			else{ // In parent process
-				waitpid(pid,NULL, 0);
+				if (background == TRUE){ // if & symbol DO NOT WAIT
+					; // No waiting
+				}
+				else {
+					waitpid(pid,NULL, 0);
+				}
 			}
 		} 
 		else {  // One of my built in commands is being used
-			int saved_stdout;
-			saved_stdout = dup (1);
+				
+				/******* Background Operation ******/
+			if (background == TRUE){  // if there is an &
+				pid_t pid=fork();
+				
+				if (pid==0){ // in child
 
-			dup2(file, 1);  // output redirection
+					dup2(file, 1);  // output redirection
 
-			cmdChoice(leftSize, left);
+					cmdChoice(leftSize, left);
+					_exit(0);  // child exits when done
+				}
+				else {
+					; // don't wait
+				}
+			}	/************* end *************/
+			else {
+				int saved_stdout;
+				saved_stdout = dup (1);
 
-			dup2(saved_stdout, 1);  // returns back to normal stdout
-			close(saved_stdout);	
+				dup2(file, 1);  // output redirection
+
+				cmdChoice(leftSize, left);
+
+				dup2(saved_stdout, 1);  // returns back to normal stdout
+				close(saved_stdout);	
+			}
 		}
 	}		
 }
 
-void inputReDir(char **left, char **right, int leftSize, int builtin){
+void inputReDir(char **left, char **right, int leftSize, int builtin, int background){
 
 	char *str;
 	char buffer[100];
@@ -198,14 +205,54 @@ void inputReDir(char **left, char **right, int leftSize, int builtin){
 					printError();
 				}
 				else{ // In parent process
-					waitpid(pid,NULL, 0);
+					if (background == TRUE){ // if & symbol DO NOT WAIT
+						; // No waiting
+					}
+					else {
+						waitpid(pid,NULL, 0);
+					}
 				}
 			}
 			else {
-				cmdChoice(pos -1 , left);
+					/******* Background Operation ******/
+				if (background == TRUE){  // if there is an &
+					pid_t pid=fork();
+					
+					if (pid==0){ // in child
+
+						cmdChoice(pos -1, left);
+						_exit(0);  // child exits when done
+					}
+					else {
+						; // don't wait
+					}
+				}	/************* end *************/
+				else {
+					cmdChoice(pos -1 , left);
+				}
 			}
 
 			//printf("%s\n", left);
+		}
+	}
+}
+
+void systemcommand(char **argv, int background){
+	pid_t pid=fork();
+	if(pid==0){ //In child process
+
+		execvp(argv[0], argv);  // execs from /bin
+			// Printed only if exec fails
+		printf("testpoint\n");
+		printError();
+	}
+
+	else{ // In parent process
+		if (background == TRUE){ // if & symbol DO NOT WAIT
+			; // No waiting
+		}
+		else {
+			waitpid(pid,NULL, 0);
 		}
 	}
 }
