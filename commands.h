@@ -6,7 +6,6 @@ void clear(); // clr command
 void *dir(int argc, char **argv); // dir command
 void environls();  // environ command
 void echo(int argc, char **argv); // echo command
-void *ls();
 void help(); // help command
 void usrPause(); // Pause command
 char *upOne(char **argv); // Handles "cd .." case

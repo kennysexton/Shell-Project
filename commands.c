@@ -126,21 +126,9 @@ void help(){
 	fclose(rp);	
 }
 
-void *ls(){ // slightly modified dir command
-
-	DIR *d = opendir(getenv("PWD"));
-	struct dirent *dir;
-	if (d){
-		while ((dir = readdir(d)) != NULL){
-			printf("%s ", dir->d_name);
-		}
-		closedir(d);
-	}	
-}
-
 void usrPause(){
 	printf(ANSI_COLOR_BIRGHT_BLUE "--paused--\n" ANSI_COLOR_RESET);
-	printf("Press any key to continue ");
+	printf("Press any key to continue: ");
 	char endPause[10];
 
 	fgets(endPause, sizeof(endPause), stdin);
@@ -196,10 +184,6 @@ void cmdChoice(int argc, char **argv){
 	else if(strcmp(argv[0], "help") == 0){ // help
 		help();
 	}
-	else if(strcmp(argv[0], "ls") == 0){ // ls
-		ls(argc, argv);
-		printf("\n");
-	}
 	else if(strcmp(argv[0], "pause") == 0){ // pause
 		usrPause();
 	}
@@ -239,9 +223,6 @@ int builtinCheck(char **argv){
 		return TRUE;
 	}
 	else if(strcmp(argv[0], "help") == 0){ // help
-		return TRUE;
-	}
-	else if(strcmp(argv[0], "ls") == 0){ // ls
 		return TRUE;
 	}
 	else if(strcmp(argv[0], "pause") == 0){ // pause

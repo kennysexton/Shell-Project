@@ -59,12 +59,13 @@ int main() {
 
 	while(1){ // exit the program by typing "quit","exit" or using your escape command ex. ctrl^c
 
-		prompt();	
+		prompt(); 	
 		special = -1;
-			/* Read Input */
+
+			/* ----------------------------------- Read Input ----------------------------------- */
 		fgets(lineInput, 80 ,stdin);
 
-		if(strlen(lineInput) < 3){
+		if(strlen(lineInput) < 3){ // too small input prints error
 			printf(ANSI_COLOR_BRIGHT_RED "Invalid Command: " ANSI_COLOR_RESET);
 			printf("type "); 
 			printf(ANSI_COLOR_BIRGHT_BLUE "help" ANSI_COLOR_RESET);
@@ -85,7 +86,7 @@ int main() {
 				
 			}
 
-				/* ----------------------------------- Parse Input ----------------------------------- */
+			/* ----------------------------------- Parse Input ----------------------------------- */
 			argv[argc] = token;
 			// printf("%s %s %d\n", token, argv[argc], argc);
 
@@ -96,9 +97,10 @@ int main() {
 				// printf("%s %s %d\n", token, argv[argc], argc);
 			}
 
+			/* ----------------------------------- Check Builtin ----------------------------------- */
 			builtin = builtinCheck(argv);
 
-			if (builtin == FALSE){
+			if (builtin == FALSE){ // Not a built in.  Will uses a fork and exec instead
 				special = 4;
 			}
 			
@@ -167,9 +169,8 @@ int main() {
 					break;
 				case 3:		// |
 					mypipe(left, right, specialpos, builtin, background);
-					printf("made it out\n");
 					break;
-				case 4:
+				case 4:		// Non built in
 					systemcommand(argv, background);
 					break;
 				case 5: // error
@@ -182,7 +183,7 @@ int main() {
 					cmdChoice(argc, argv);
 				}
 
-				// Rest argc and argv	
+			/* ----------------------------------- Reset ------------------------------------ */	
 			argc = 0;
 			ioredirect = FALSE;
 			background = FALSE;
