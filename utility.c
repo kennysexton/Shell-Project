@@ -214,45 +214,71 @@ void mypipe(char **left, char **right, int leftSize, int builtin, int background
 	int fd[2];
 	char buf[BUF_SIZE];
 	int bytes_read;
-	
-	// Case 1
-	pid_t pid1=fork();
-	if (pid1==0){ // in child
-		if (builtin == FALSE){
-			if(pipe(fd)==-1){
-				printf("piper error\n");
-				return;
-			}
+	int type;
 
-			if((pid=fork()) == -1) {
-				printf("fork Error\n");
-				return;
-			}
-			else if (pid==0){
-				close(1);
-				dup2(fd[WRITE], 1);
-				close(fd[READ]);
-				execvp(left[0], left);
-			}
-			else {
-				close(0);
-				dup2(fd[READ], STDIN_FILENO);
-				close(fd[WRITE]);
-				execvp(right[0], right);
-			}		
-		// } else {
-		printf("bananas\n");
-		 }
-	}
-	else { // in parent
-		if (background == TRUE){ // if & symbol DO NOT WAIT
-			; // No waiting
+	pid_t pid1;
+
+	/* Condition Seperator */
+	if (builtin == TRUE){
+		if (builtinCheck(left) == 1 && builtinCheck(right) == 1){
+			type =  4;
+		} 
+		else if (builtinCheck(right) == 1){
+			type = 3;
 		}
-		else {
-			waitpid(pid,NULL, 0);
+		else if (builtinCheck(left) == 1){
+			type = 2;
 		}
 	}
-}
+	else {
+		type = 1;
+	}
+
+	switch (type){
+		case 1:  // No builtins used at all
+			pid1=fork();
+			if (pid1==0){ // in child
+		
+				if(pipe(fd)==-1){
+					printf("piper error\n");
+					return;
+				}
+
+				if((pid=fork()) == -1) {
+					printf("fork Error\n");
+					return;
+				}
+				else if (pid==0){
+					close(1);
+					dup2(fd[WRITE], 1);
+					close(fd[READ]);
+					execvp(left[0], left);
+				}
+				else {
+					close(0);
+					dup2(fd[READ], STDIN_FILENO);
+					close(fd[WRITE]);
+					execvp(right[0], right);
+				}		
+			}
+			else { // in parent
+				if (background == TRUE){ // if & symbol DO NOT WAIT
+					; // No waiting
+				}
+				else {
+					waitpid(pid,NULL, 0);
+				}
+			}
+			break;
+
+		case 2:
+		default: 
+			printf(ANSI_COLOR_BRIGHT_RED "Invalid Pipe: " ANSI_COLOR_RESET);  
+			printf("type "); 
+			printf(ANSI_COLOR_BIRGHT_BLUE "help" ANSI_COLOR_RESET);
+			printf(" to view manual\n");
+	} // end switch
+} // end function
 
 	// Non builtins get executed form /bin
 void systemcommand(char **argv, int background){

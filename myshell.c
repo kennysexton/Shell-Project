@@ -12,10 +12,6 @@ int checkToken(char* token);
 	/* Batch File */
 char *inputFromFile();
 
-	/* Check */
-int builtinCheck(char **argv);  // check if user typed a builtin
-
-
 	/* Includes */
 #include <stdio.h>
 #include <stdlib.h>
@@ -271,43 +267,4 @@ char *inputFromFile(){
 	// printf("%s", line);
 	return line;
 	fclose(rp);
-}
-
-int builtinCheck(char **argv){
-	if(strcmp(argv[0], "cd") == 0){  // cd
-		return TRUE;
-	}
-	else if(strcmp(argv[0], "clr") == 0 || strcmp(argv[0], "clear") == 0) {  //clear
-		return TRUE;
-	}
-	else if(strcmp(argv[0], "dir") == 0){ // dir
-		return TRUE;	
-	}
-	else if (strcmp(argv[0], "environ") == 0){ // environ
-		return TRUE;
-	}
-	else if (strcmp(argv[0], "echo") == 0){ // echo 	
-		return TRUE;
-	}
-	else if (strcmp(argv[0], "exit") == 0){ // exit 	
-		return TRUE;
-	}
-	else if(strcmp(argv[0], "help") == 0){ // help
-		return TRUE;
-	}
-	else if(strcmp(argv[0], "ls") == 0){ // ls
-		return TRUE;
-	}
-	else if(strcmp(argv[0], "pause") == 0){ // pause
-		return TRUE;
-	}
-	else if(strcmp(argv[0], "pwd") == 0){  //pwd
-		return TRUE;
-	}
-	else if (strcmp(argv[0], "quit") == 0){ // quit	
-		return TRUE;
-	}
-	else {
-		return FALSE;
-	}
 }

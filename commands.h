@@ -11,5 +11,6 @@ void help(); // help command
 void usrPause(); // Pause command
 char *upOne(char **argv); // Handles "cd .." case
 void *cmdChoice(int argc, char **argv); // What command is called
+int builtinCheck(char **argv);  // check if user typed a builtin
 
 #endif // COMMANDS_H_
