@@ -45,7 +45,7 @@ void outputReDir(char **left, char **right, int leftSize, int builtin, int backg
 			strcat(str, ".txt");
 		}
 
-		int file = open(str, O_WRONLY | O_CREAT | O_EXCL, 0777);
+		int file = open(str, O_WRONLY | O_TRUNC | O_CREAT, 0777);
 
 		if (builtin == FALSE){  // If the user is not using one of my built in commands
 
@@ -57,6 +57,8 @@ void outputReDir(char **left, char **right, int leftSize, int builtin, int backg
 
 				dup2(saved_stdout, 1);  // returns back to normal stdout
 				close(saved_stdout);
+
+				printf(ANSI_COLOR_BRIGHT_RED "Exec failure \n" ANSI_COLOR_RESET);
 		} 
 		else {  // One of my builtin commands is being used
 			
@@ -111,8 +113,11 @@ void append(char **left, char **right, int leftSize, int builtin, int background
 			dup2(file, 1);
 			systemcommand(left, background);  // where fork and exec are done
 
+
 			dup2(saved_stdout, 1);  // returns back to normal stdout
 			close(saved_stdout);
+
+			printf(ANSI_COLOR_BRIGHT_RED "Exec failure \n" ANSI_COLOR_RESET);
 		} 
 		else {  // One of my built in commands is being used
 				
@@ -146,7 +151,7 @@ void append(char **left, char **right, int leftSize, int builtin, int background
 	}		
 }
 
-void inputReDir(char **left, char **right, int leftSize, int builtin, int background){
+void inputReDir(char **left, char **right, int leftSize, int builtin, int background){  // Reached if input is a correclty formatted | pipe
 
 	char *str;
 	char buffer[100];
@@ -182,6 +187,8 @@ void inputReDir(char **left, char **right, int leftSize, int builtin, int backgr
 			}
 			if (builtin == FALSE){
 				systemcommand(left, background);
+
+				printf(ANSI_COLOR_BRIGHT_RED "Exec failure \n" ANSI_COLOR_RESET);
 			}
 			else {
 					/******* Background Operation ******/
@@ -206,12 +213,10 @@ void inputReDir(char **left, char **right, int leftSize, int builtin, int backgr
 }
 
 
-void mypipe(char **left, char **right, int leftSize, int builtin, int background){
+void mypipe(char **left, char **right, int leftSize, int builtin, int background){ // Reached if input is a correclty formatted | pipe
 
 	pid_t pid;
 	int fd[2];
-	char buf[BUF_SIZE];
-	int bytes_read;
 
 	pid_t pid1;
 	if (builtin == FALSE){
@@ -308,7 +313,7 @@ void systemcommand(char **argv, int background){
 	}
 }
 
-void printError(){
+void printError(){ // Prints an error message
 	printf(ANSI_COLOR_BRIGHT_RED "Invalid Command: " ANSI_COLOR_RESET);  
 	printf("type "); 
 	printf(ANSI_COLOR_BIRGHT_BLUE "help" ANSI_COLOR_RESET);

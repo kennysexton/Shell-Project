@@ -1,43 +1,63 @@
-				kshell manual
+			kshell manual
 ---------------------------------------------------------------
 Type 'help' to see this list
 ---------------------------------------------------------------
 
-				Commands
+			Commands
 ===============================================================
 cd [path]
 	Used to change the current directory.  
 	If path is not specified, the current directory will
 	be returned.
 
+	ex.) $ cd /home/users/Jen/documents
+
 clear or clr
 	clears the screen of all prior information.
+
+	ex.) $ clr
 
 dir [path]
 	Will list all of the files in the specified directory.
 
+	ex.) $ dir /home/users/kyle/downloads
+
 environ
 	List all of environment strings
+
+	ex.) $ environ
 
 echo [comment]
 	Displays the comment following echo
 
+	ex.) $ echo repeat after me
+
 exit
-	exits the shell	
+	exits the shell
+
+	ex.) % help
 
 help
 	displays this manual
+	
+	ex.) $ help
 
 pause
 	Temporarily stops the program until a character is entered
+	
+	ex.) $ pause
 
 pwd
 	Shows the current working directory
 
+	ex.) $ pwd
+
 quit
 	exits the shell
 
-				i/o Redirection
+	ex.) $ quit
+
+			i/o Redirection
 ===============================================================
 
 -----  Batchfile
@@ -45,26 +65,40 @@ myshell batchfile
 	Will direct the shell to read commands from a 'batchfile' 
 	in the project directory
 
+	ex.) $ myshell batchfile
+
 -----  Output Redirection
 [command] [arguments] > [file]
 	the result of command on (optional) arguments will appear in
 	a file located at the current directory.
 
-	ex.) echo Hello World > myfile
+	ex.) $ echo Hello World > myfile
 
 -----  Output Append
 [command] [arguments] >> [file]
-	the result of command on (optional) arguments will appear in
+	the result of command on arguments will appear in
 	a file located at the current directory.  If the document 
 	already exists.  The result will apend to the file.
 
-	ex.) echo This will appear in a file 'cats' >> cat
+	ex.) $ echo This will appear in a file 'cats' >> cat
 
 -----  Input Redirection
 [command] < [file]
 	command will execute with the arguments provided from the file
 
-	ex.) echo < readfile
+	ex.) $ echo < readfile
 
 -----  Pipe
 [command] [arguments] | [command] [arguments]
+	output of left command and arguments is used as the input 
+	for right command and arguments
+
+	ex.) $ cat book.txt | wc
+
+			Modifiers
+===============================================================
+&
+	adding the '&' character to any input will make the command
+	execute in the background as a separate process
+
+	ex.) $ echo this won't appear &

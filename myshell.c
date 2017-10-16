@@ -46,8 +46,8 @@ int main() {
 	char **left;
 	char **right;
 	int ioredirect = FALSE;
-	argv = malloc(sizeof(char)* 200);
-	left = malloc(sizeof(char)* 100);
+	argv = malloc(sizeof(char)* 200);  // array that holds user input
+	left = malloc(sizeof(char)* 100);  
 	right = malloc(sizeof(char)* 100);
 
 	int argc = 0; // argument counter
@@ -141,16 +141,19 @@ int main() {
 
 			/* ----------------------------------- Left Right Split ------------------------------------ */
 			if (ioredirect == TRUE){
-
 					/* Checks */
 				if (argc - 1 == specialpos){  // modifiers > >> < | require arguments on both sides of modifier
 					special = 5;  // set to error
 				}
+				if (specialpos < 1){ // modifer can't be in first position
+					special = 5;
+				}
+
 				else{
 					for(i=0; i< specialpos; i++){ // fill left
 						left[i] = argv[i];
 					}
-					i=0;
+					i=0; /// reset i
 
 					for(j = specialpos + 1; j < argc; j++){ // fill right
 						right[i] = argv[j];
@@ -159,6 +162,7 @@ int main() {
 				}
 			}
 
+			/* ----------------------------------- Switch ------------------------------------ */
 			switch(special) {
 				case 0:		// >
 					outputReDir(left, right, specialpos, builtin, background);
@@ -185,7 +189,7 @@ int main() {
 					if (background == FALSE){
 						cmdChoice(argc, argv);
 					} 
-					else { // run in background
+					else { // run in background &
 						pid_t pid=fork();
 				
 						if (pid==0){ // in child
@@ -204,6 +208,7 @@ int main() {
 				}
 
 			/* ----------------------------------- Reset ------------------------------------ */	
+			// Reset variables 
 			argc = 0;
 			ioredirect = FALSE;
 			background = FALSE;

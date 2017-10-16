@@ -101,11 +101,11 @@ void help(){
 	char space[10]; 
 
 	rp = fopen("readme", "r");
-	while ((fgets(line, 200, rp) != NULL) && numLines < 25){
+	while ((fgets(line, 200, rp) != NULL) && numLines < 24){
 		
 		printf("%s", line );
 		
-		if(numLines == 24){ // More
+		if(numLines == 23){ // More
 			printf("\t--Press space to view more-- ");
 			fgets(space, sizeof(space), stdin);
 
