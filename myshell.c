@@ -258,7 +258,7 @@ const char * pathTrim(char *path){
 	int pos2 = 0;
 	int pos = 0;
 	int count = 0;
-	char *trimPath = malloc (sizeof (char) * length);
+	char *trimPath = calloc (length, sizeof (char));
 	
 	for (i=0; i < length; i++){  // scans the path for char '/'
 		if(path[i] == '/'){
