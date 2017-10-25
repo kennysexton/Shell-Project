@@ -58,7 +58,6 @@ void outputReDir(char **left, char **right, int leftSize, int builtin, int backg
 				dup2(saved_stdout, 1);  // returns back to normal stdout
 				close(saved_stdout);
 
-				printf(ANSI_COLOR_BRIGHT_RED "Exec failure \n" ANSI_COLOR_RESET);
 		} 
 		else {  // One of my builtin commands is being used
 			
@@ -117,7 +116,6 @@ void append(char **left, char **right, int leftSize, int builtin, int background
 			dup2(saved_stdout, 1);  // returns back to normal stdout
 			close(saved_stdout);
 
-			printf(ANSI_COLOR_BRIGHT_RED "Exec failure \n" ANSI_COLOR_RESET);
 		} 
 		else {  // One of my built in commands is being used
 				
@@ -188,7 +186,6 @@ void inputReDir(char **left, char **right, int leftSize, int builtin, int backgr
 			if (builtin == FALSE){
 				systemcommand(left, background);
 
-				printf(ANSI_COLOR_BRIGHT_RED "Exec failure \n" ANSI_COLOR_RESET);
 			}
 			else {
 					/******* Background Operation ******/

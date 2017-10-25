@@ -278,7 +278,7 @@ const char * pathTrim(char *path){
 	// reads batchfile and returns the string contained
 char *inputFromFile(){
 	FILE *rp; // read pointer
-	char *line = malloc(sizeof(char) * 80);
+	char *line = calloc (80, sizeof (char));
 	char c;
 	// char line[80];
 	int i=0;
@@ -294,4 +294,5 @@ char *inputFromFile(){
 	// printf("%s", line);
 	return line;
 	fclose(rp);
+	free(line);
 }
