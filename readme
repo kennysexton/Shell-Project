@@ -35,7 +35,7 @@ echo [comment]
 exit
 	exits the shell
 
-	ex.) % help
+	ex.) $ help
 
 help
 	displays this manual
