@@ -76,7 +76,7 @@ int main() {
 		else {
 
 			char *token;
-			char flags[] = {' ', '\n'};
+			char flags[]=" \n\t";
 
 			if(strcmp(lineInput, batchfile) == 0){ // if User types "myshell batchfile"
 				strcpy(fileInput,inputFromFile());
